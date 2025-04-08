@@ -91,8 +91,16 @@ public static class Randomizer
             RandomizerTrackedDataManager.Initialize();
             RandomizerStatsManager.Initialize();
             Randomizer.RelicCount = 0;
-            Randomizer.GrenadeZone = "MIA";
+            Randomizer.BashZone = "MIA";
+            Randomizer.ChargeFlameZone = "MIA";
+            Randomizer.WallJumpZone = "MIA";
             Randomizer.StompZone = "MIA";
+            Randomizer.DoubleJumpZone = "MIA";
+            Randomizer.ChargeJumpZone = "MIA";
+            Randomizer.ClimbZone = "MIA";
+            Randomizer.GlideZone = "MIA";
+            Randomizer.DashZone = "MIA";
+            Randomizer.GrenadeZone = "MIA";
             Randomizer.StompTriggers = false;
             Randomizer.GoalModeFinish = false;
             Randomizer.SpawnWith = "";
@@ -106,6 +114,7 @@ public static class Randomizer
             Keysanity.Initialize();
             Randomizer.EnhancedMode = false;
             Randomizer.EnhancedSeinInSeed = false;
+            Randomizer.TreeHints = false;
 
             if (Randomizer.SeedFilePath == null)
             {
@@ -706,6 +715,47 @@ public static class Randomizer
         Randomizer.printInfo(message);
     }
 
+    private static void addTreeHint(List<string> hints, string skill, string zone, AbilityType ability, int treeId) {
+        if (Characters.Sein) {
+            if (Characters.Sein.PlayerAbilities.HasAbility(ability)) {
+                hints.Add($"${skill}: {zone}$");
+            } else if (((Characters.Sein.Inventory.GetRandomizerItem(1001) >> treeId) & 0x1) == 1) {
+                hints.Add($"{skill}: {zone}");
+            }
+        }
+    }
+
+	private static string getTreeHints()
+    {
+        List<string> hints = new List<string>();
+        addTreeHint(hints, "Wall Jump", Randomizer.WallJumpZone, AbilityType.WallJump, 1);
+        addTreeHint(hints, "Charge Flame", Randomizer.ChargeFlameZone, AbilityType.ChargeFlame, 2);
+        addTreeHint(hints, "Double Jump", Randomizer.DoubleJumpZone, AbilityType.DoubleJump, 3);
+        addTreeHint(hints, "Bash", Randomizer.BashZone, AbilityType.Bash, 4);
+        addTreeHint(hints, "Stomp", Randomizer.StompZone, AbilityType.Stomp, 5);
+        addTreeHint(hints, "Glide", Randomizer.GlideZone, AbilityType.Glide, 6);
+        addTreeHint(hints, "Climb", Randomizer.ClimbZone, AbilityType.Climb, 7);
+        addTreeHint(hints, "Charge Jump", Randomizer.ChargeJumpZone, AbilityType.ChargeJump, 8);
+        addTreeHint(hints, "Grenade", Randomizer.GrenadeZone, AbilityType.Grenade, 9);
+        addTreeHint(hints, "Dash", Randomizer.DashZone, AbilityType.Dash, 10);
+
+
+        if (hints.Count == 0) {
+            return "";
+        }
+
+        string hint = "\n";
+        for (int i = 0; i < hints.Count; i++) {
+			hint += hints[i];
+			if (hints.Count >= 4 && i + 1 == Math.Ceiling(hints.Count / 2.0)) {
+				hint += "\n";
+			} else {
+				hint += "    ";
+			}
+		}
+        return hint;
+    }
+
     public static void showProgress()
     {
         try {
@@ -761,6 +811,10 @@ public static class Randomizer
                     g = Characters.Sein && Characters.Sein.PlayerAbilities.HasAbility(AbilityType.Grenade) ? "$" : "";
                 }
                 text += $"\n{s}Stomp: {StompZone}{s}{g}    Grenade: {GrenadeZone}{g}";
+            }
+            if(Randomizer.TreeHints)
+            {
+                text += getTreeHints();
             }
             Randomizer.printInfo(text);
         }
@@ -1030,7 +1084,7 @@ public static class Randomizer
                         {
                             RandomizerCreditsManager.CreditsDone = false;
                         }
-                    } else if(scene == "forlornRuinsNestC" && get(1105) == 0) {
+                    } else if(scene == "forlornRuinsNestC" && get(1105) == 0 && !Randomizer.TreeHints) {
                             RandomizerBonus.UpgradeID(81);
                     }
                     else if(scene == "creditsScreen")
@@ -1285,6 +1339,9 @@ public static class Randomizer
 
             else if (flag == "enhanced")
                 Randomizer.EnhancedMode = true;
+
+            else if (flag == "treehints")
+                Randomizer.TreeHints = true;
  
             if (flag == "seintalks")
                 Randomizer.EnhancedSeinInSeed = true;
@@ -1373,13 +1430,37 @@ public static class Randomizer
         }
         if (code == "SK")
         {
-            if (id_number == 51)
-            {
-                Randomizer.GrenadeZone = area;
-            }
-            else if (id_number == 4)
-            {
+            switch (id_number) {
+            case 0:
+                Randomizer.BashZone = area;
+                break;
+            case 2:
+                Randomizer.ChargeFlameZone = area;
+                break;
+            case 3:
+                Randomizer.WallJumpZone = area;
+                break;
+            case 4:
                 Randomizer.StompZone = area;
+                break;
+            case 5:
+                Randomizer.DoubleJumpZone = area;
+                break;
+            case 8:
+                Randomizer.ChargeJumpZone = area;
+                break;
+            case 12:
+                Randomizer.ClimbZone = area;
+                break;
+            case 14:
+                Randomizer.GlideZone = area;
+                break;
+            case 50:
+                Randomizer.DashZone = area;
+                break;
+            case 51:
+                Randomizer.GrenadeZone = area;
+                break;
             }
         }
         if (Randomizer.CluesMode && code == "EV" && id_number % 2 == 0)
@@ -1616,9 +1697,26 @@ public static class Randomizer
 
     public static List<String> RandomExpNames;
 
+    public static string BashZone;
+
+    public static string ChargeFlameZone;
+
+    public static string WallJumpZone;
+
+    public static string StompZone;
+
+    public static string DoubleJumpZone;
+
+    public static string ChargeJumpZone;
+
+    public static string ClimbZone;
+
+    public static string GlideZone;
+
+    public static string DashZone;
+
     public static string GrenadeZone;
     // welcome to the...
-    public static string StompZone;
 
     public static bool CreditsActive;
 
@@ -1683,4 +1781,6 @@ public static class Randomizer
     public static bool EnhancedMode;
 
     public static bool EnhancedSeinInSeed;
+
+    public static bool TreeHints;
 }
