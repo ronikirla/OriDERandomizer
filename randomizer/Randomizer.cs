@@ -725,7 +725,7 @@ public static class Randomizer
         }
     }
 
-	private static string getTreeHints()
+    private static string getTreeHints()
     {
         List<string> hints = new List<string>();
         addTreeHint(hints, "Wall Jump", Randomizer.WallJumpZone, AbilityType.WallJump, 1);
@@ -746,13 +746,13 @@ public static class Randomizer
 
         string hint = "\n";
         for (int i = 0; i < hints.Count; i++) {
-			hint += hints[i];
-			if (hints.Count >= 4 && i + 1 == Math.Ceiling(hints.Count / 2.0)) {
-				hint += "\n";
-			} else {
-				hint += "    ";
-			}
-		}
+            hint += hints[i];
+            if (hints.Count >= 4 && i + 1 == Math.Ceiling(hints.Count / 2.0)) {
+                hint += "\n";
+            } else {
+                hint += "    ";
+            }
+        }
         return hint;
     }
 
