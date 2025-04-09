@@ -716,12 +716,11 @@ public static class Randomizer
     }
 
     private static void addTreeHint(List<string> hints, string skill, string zone, AbilityType ability, int treeId) {
-        if (Characters.Sein) {
-            if (Characters.Sein.PlayerAbilities.HasAbility(ability)) {
-                hints.Add($"${skill}: {zone}$");
-            } else if (((Characters.Sein.Inventory.GetRandomizerItem(1001) >> treeId) & 0x1) == 1) {
-                hints.Add($"{skill}: {zone}");
-            }
+        if (Characters.Sein &&
+            !Characters.Sein.PlayerAbilities.HasAbility(ability) &&
+            (((Characters.Sein.Inventory.GetRandomizerItem(1001) >> treeId) & 0x1) == 1))
+        {
+            hints.Add($"{skill}: {zone}");
         }
     }
 
